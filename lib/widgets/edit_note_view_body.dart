@@ -15,46 +15,63 @@ class EditNoteViewBody extends StatefulWidget {
 }
 
 class _EditNoteViewBodyState extends State<EditNoteViewBody> {
-  String? title, subTitle;
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.note.title);
+    _contentController = TextEditingController(text: widget.note.subTitle);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveNote() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    final wasSaved = await context.read<NotesCubit>().updateNote(
+          note: widget.note,
+          title: _titleController.text,
+          content: _contentController.text,
+        );
+    if (wasSaved && mounted) Navigator.of(context).pop(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 16),
       child: Column(
         children: [
-          CustomAppBar(
-              onTap: () {
-                widget.note.title = title ?? widget.note.title;
-                widget.note.subTitle = subTitle ?? widget.note.subTitle;
-                widget.note.save();
-                BlocProvider.of<NotesCubit>(context).fetchAllNotes();
-                Navigator.of(context).pop();
-              },
-              icon: Icons.check,
-              title: 'Edit Note'),
+          CustomAppBar(onTap: _saveNote, icon: Icons.check, title: 'Edit Note'),
           const SizedBox(height: 20),
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                CustomTextField(
-                  
-                  onChanged: (value) {
-                    title = value;
-                  },
-                  hintText: 'Write a title to your note',
-                  labelText: 'Title',
-                  
-                ),
-                const SizedBox(height: 20),
-                CustomTextField(
-                  onChanged: (value) {
-                    subTitle = value;
-                  },
-                  maxLines: 5,
-                  hintText: 'Write a content to your note',
-                  labelText: 'Content',
-                ),
-              ],
+          Expanded(
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  CustomTextField(
+                    controller: _titleController,
+                    textInputAction: TextInputAction.next,
+                    hintText: 'Write a title to your note',
+                    labelText: 'Title',
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextField(
+                    controller: _contentController,
+                    maxLines: 5,
+                    hintText: 'Write content for your note',
+                    labelText: 'Content',
+                  ),
+                ],
+              ),
             ),
           ),
         ],

@@ -31,6 +31,7 @@ class _AddNoteFormState extends State<AddNoteForm> {
           CustomTextField(
             hintText: 'Write a title to your note',
             labelText: 'Title',
+            textInputAction: TextInputAction.next,
             onSaved: (value) {
               title = value;
             },
@@ -53,10 +54,11 @@ class _AddNoteFormState extends State<AddNoteForm> {
                   if (formState.currentState!.validate()) {
                     formState.currentState!.save();
                     NoteModel note = NoteModel(
-                        title: title ?? 'Null',
-                        subTitle: subTitle ?? 'Null',
-                        date: DateTime.now().toString(),
-                        color: Colors.amber.value);
+                      title: title!.trim(),
+                      subTitle: subTitle!.trim(),
+                      date: DateTime.now().toIso8601String(),
+                      color: Colors.amber.toARGB32(),
+                    );
                     BlocProvider.of<AddNoteCubit>(context).addNote(note);
                   }
                   setState(() {

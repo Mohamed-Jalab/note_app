@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:note_app/cubits/notes/notes_cubit.dart';
 import 'package:note_app/widgets/notes_list_view.dart';
 
-import '../models/note_model.dart';
 import 'custom_app_bar.dart';
 
 class NotesViewBody extends StatefulWidget {
@@ -22,14 +21,23 @@ class _NotesViewBodyState extends State<NotesViewBody> {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(left: 24.0, right: 24.0, top: 16),
-      child: Column(
-        children: [
-          CustomAppBar(icon: Icons.search, title: 'Notes'),
-          SizedBox(height: 10),
-          Expanded(child: NotesListView()),
-        ],
+    return BlocListener<NotesCubit, NotesState>(
+      listener: (context, state) {
+        if (state is NotesFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+      child: const Padding(
+        padding: EdgeInsets.only(left: 24.0, right: 24.0, top: 16),
+        child: Column(
+          children: [
+            CustomAppBar(icon: Icons.note_alt_outlined, title: 'Notes'),
+            SizedBox(height: 10),
+            Expanded(child: NotesListView()),
+          ],
+        ),
       ),
     );
   }

@@ -8,6 +8,8 @@ class EditNoteView extends StatelessWidget {
   final NoteModel note;
   @override
   Widget build(BuildContext context) {
-    return  SafeArea(child: Scaffold(body: EditNoteViewBody(note: note)));
+    return SafeArea(
+      child: Scaffold(body: EditNoteViewBody(note: note)),
+    );
   }
 }

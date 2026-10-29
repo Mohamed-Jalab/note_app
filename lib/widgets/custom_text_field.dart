@@ -7,7 +7,9 @@ class CustomTextField extends StatelessWidget {
     this.labelText,
     this.hintText,
     this.onSaved,
-    this.onChanged, this.controller,
+    this.onChanged,
+    this.controller,
+    this.textInputAction,
   });
   final int maxLines;
   final String? labelText;
@@ -15,14 +17,18 @@ class CustomTextField extends StatelessWidget {
   final Function(String?)? onSaved;
   final Function(String?)? onChanged;
   final TextEditingController? controller;
+  final TextInputAction? textInputAction;
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      textInputAction: textInputAction,
       onSaved: onSaved,
       onChanged: onChanged,
       validator: (value) {
-        if (value?.isEmpty ?? true) return 'Field is required';
+        if (value == null || value.trim().isEmpty) {
+          return '$labelText is required';
+        }
         return null;
       },
       maxLines: maxLines,
